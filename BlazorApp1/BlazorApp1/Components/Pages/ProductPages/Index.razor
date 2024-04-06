@@ -1,0 +1,39 @@
+﻿@page "/products"
+@using Microsoft.AspNetCore.Components.QuickGrid
+@inject BlazorApp1.Data.BlazorApp1Context DB
+@using BlazorApp1.Models
+@rendermode InteractiveServer   
+
+<PageTitle>Index</PageTitle>
+
+<h1>Index</h1>
+
+<p>
+    <a href="products/create">Create New</a>
+</p>
+
+<QuickGrid Class="table" Items="FilterdProducts" Pagination="state">
+    <PropertyColumn Property="product => product.Name"  Sortable="true">
+        <ColumnOptions>
+            <div>
+                <input type="search" @bind="titleFilter" @bind:event="oninput" autocomplete="on" autofocus/>
+            </div>
+        </ColumnOptions>
+        </PropertyColumn>
+    <PropertyColumn Property="product => product.Place" />
+
+    <TemplateColumn Context="product" >
+        <a href="@($"products/edit?id={product.Id}")">Edit</a> |
+        <a href="@($"products/details?id={product.Id}")">Details</a> |
+        <a href="@($"products/delete?id={product.Id}")">Delete</a>
+    </TemplateColumn>
+</QuickGrid>
+
+<Paginator State="state" />
+
+@code{
+    PaginationState state = new PaginationState{ItemsPerPage=10};
+    private string titleFilter="";
+
+    IQueryable<Product> FilterdProducts => DB.Product.Where(p=>p.Name.ToLower().Contains(titleFilter.ToLower()));
+}
